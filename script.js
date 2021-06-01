@@ -5,6 +5,7 @@ class Slider {
         this.sliderContainer = this.slider.querySelector(".slider-container");
         this.prevButton = this.slider.querySelector('.button-left');
         this.nextButton = this.slider.querySelector('.button-right');
+        this.interval = this.slider.getAttribute('data-interval') || 3000;
 
         /* Attributes */
         this.currentSlide = 0;
@@ -14,7 +15,7 @@ class Slider {
         this.transformValue = 0;
 
         /* Options */
-        this.effectiveTransform = 400;
+        this.effectiveTransform =  400;
         this.totalSlides = this.sliderContainer.childElementCount;
         this.windowSize = this.totalSlides * window.innerWidth;
         this.sliderContainer.style.width = `${this.windowSize}px`;
@@ -86,7 +87,7 @@ class Slider {
         if(this.timer != null) clearInterval(this.timer);
         this.timer = setInterval(function (_) {
             this.nextSlide();
-        }.bind(this), 3000);
+        }.bind(this), this.interval);
     }
 
     whileDragging(event) {

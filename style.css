@@ -65,6 +65,7 @@ table {
     fill: transparent;
     left: 15px;
 }
+
 .button-right{
     left: auto;
     right: 15px;
@@ -87,5 +88,4 @@ table {
 
 .button-right, .button-left{
     display: flex;
-
 }
