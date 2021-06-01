@@ -66,6 +66,14 @@ table {
     left: 15px;
 }
 
+.progressBar{
+    height: 10px;
+    background-color: black;
+    width: 1px;
+    transform: translateY(-100%);
+    opacity: 50%;
+}
+
 .button-right{
     left: auto;
     right: 15px;
