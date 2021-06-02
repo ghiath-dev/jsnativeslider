@@ -87,9 +87,9 @@ table {
     transition: left 200ms ease-out;
 }
 
-.slide{
-    width: 33.33%;
-}
+/*.slide{*/
+/*    width: 33.33%;*/
+/*}*/
 .slider .slide img{
     width:100%;
 }

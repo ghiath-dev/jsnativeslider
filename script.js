@@ -5,9 +5,14 @@ class Slider {
         this.sliderContainer = this.slider.querySelector(".slider-container");
         this.prevButton = this.slider.querySelector('.button-left');
         this.nextButton = this.slider.querySelector('.button-right');
-        this.interval = this.slider.getAttribute('data-interval') || 3000;
+        this.interval = this.slider.dataset.interval || 3000;
         this.progressbar = this.slider.querySelector('.progressBar');
-        console.log(this.sliderContainer);
+        this.numberOfSliderPerScreen = this.slider.dataset.numberOfSlidesPerScreen || 1;
+        this.loopSlides =  this.slider.dataset.loopSlides || 'true';
+        console.log(this.loopSlides)
+        this.slideImages = this.sliderContainer.children;
+        this.changeImagesWidth();
+
 
         /* Attributes */
         this.currentSlide = 0;
@@ -15,21 +20,19 @@ class Slider {
         this.dragging = false;
         this.timer = null;
         this.transformValue = 0;
-        this.progressBarTimer = null;
-        this.progressBarWidth= 0;
 
         /* Options */
-        this.effectiveTransform =  400;
+        this.effectiveTransform = 400;
         this.totalSlides = this.sliderContainer.childElementCount;
-        this.windowSize = this.totalSlides * window.innerWidth;
+        this.windowSize = (this.totalSlides * window.innerWidth) / this.numberOfSliderPerScreen;
         this.sliderContainer.style.width = `${this.windowSize}px`;
 
         /* Functionality */
         this.slider.onmousedown = this.startDrag.bind(this);
         this.slider.onmousemove = this.whileDragging.bind(this);
         this.slider.onmouseup = this.endDrag.bind(this);
-        this.progressBarMove.bind(this);
 
+        this.progressBarMove.bind(this)
 
         if (this.prevButton != null)
             this.prevButton.onclick = this.previousSlide.bind(this);
@@ -41,42 +44,114 @@ class Slider {
     }
 
 
-    progressBarMove(){
-        if(this.progressBarWidth >= 100) {
-            this.progressBarWidth = 0;
-            this.render();
+    changeImagesWidth() {
+
+        for (var i = 0; i < this.slideImages.length; i++) {
+            this.slideImages[i].style.width = `${100 / this.slideImages.length}%`
+
+        }
+    }
+    resetTimers() {
+        if (this.timer !== null)
+            clearInterval(this.timer);
+    }
+
+    play() {
+        if (this.timer != null) this.resetTimers();
+        this.progressBarMove()
+
+
+        this.timer = setInterval(function (_) {
+            this.nextSlide();
+        }.bind(this), this.interval);
+
+    }
+
+    render() {
+        if (!this.dragging)
+            this.currentPosition = (-this.currentSlide * window.innerWidth);
+
+        this.sliderContainer.style.left = `${this.currentPosition}px`;
+    }
+
+
+    moveSlides(event) {
+        this.transformValue = event.clientX - this.initialMousePosition;
+        this.currentPosition = this.initialSlidePosition + this.transformValue;
+    }
+
+    progressBarMove() {
+        // animate
+        console.log(123)
+
+        this.progressbar.animate([
+                {width: '0%'},
+                {width: '100%'}
+            ],{
+                iterations: 1,
+                duration: parseInt(this.interval)
+            }
+        )
+    }
+    startDrag(event) {
+        this.dragging = true;
+        this.initialMousePosition = event.clientX;
+        this.initialSlidePosition = this.currentPosition;
+        this.resetTimers();
+    }
+
+    whileDragging(event) {
+        if (!this.dragging) {
             return;
         }
-
-        this.progressBarWidth = this.progressBarWidth + 0.1 ;
+        this.moveSlides(event);
         this.render();
     }
 
-    clearIntervals(){
-        clearInterval(this.timer);
-        clearInterval(this.progressBarTimer);
-        this.progressBarWidth = 0;
+    endDrag() {
+
+        this.dragging = false;
+        let shouldMove = Math.abs(this.currentPosition - this.initialSlidePosition) >= this.effectiveTransform;
+
+        if (shouldMove && this.initialSlidePosition < this.currentPosition && !this.isFirstSlide()) {
+            this.previousSlide();
+        }
+
+        if (shouldMove && this.initialSlidePosition > this.currentPosition && !this.isLastSlide()) {
+            this.nextSlide();
+
+        }
+        this.play();
+
+        this.render();
     }
+
     nextSlide() {
-        this.clearIntervals();
+        this.resetTimers();
 
         if (this.isLastSlide()) {
-            return this.goToFirstSlide();
+            console.log(this.isLastSlide())
+            if(this.loopSlides === 'true')
+                return this.goToFirstSlide();
+            return
         }
         this.goToNextSlide();
     }
 
     previousSlide() {
-        this.clearIntervals();
+        this.resetTimers();
+
         if (this.isFirstSlide()) {
-            return this.goToLastSlide();
+
+            if(this.loopSlides === 'true')
+                return this.goToLastSlide();
+            return;
         }
         this.goToPreviousSlide();
-        this.play();
     }
 
     isLastSlide() {
-        return this.currentSlide === this.totalSlides - 1;
+        return this.currentSlide === (this.totalSlides - 1) / this.numberOfSliderPerScreen;
     }
 
     isFirstSlide() {
@@ -99,7 +174,7 @@ class Slider {
     }
 
     goToLastSlide() {
-        this.currentSlide = this.totalSlides - 1;
+        this.currentSlide = (this.totalSlides - 1)/this.numberOfSliderPerScreen;
         this.play();
 
         return this.render();
@@ -112,65 +187,6 @@ class Slider {
 
         return this.render();
     }
-
-    play() {
-        if(this.timer != null) this.clearIntervals();
-        this.timer = setInterval(function (_) {
-            this.nextSlide();
-        }.bind(this), this.interval);
-        if(this.progressBarTimer)
-            clearInterval(this.progressBarTimer);
-        this.progressBarTimer = setInterval(function () {
-            this.progressBarMove();
-        }.bind(this), (this.interval/1000) );
-    }
-
-    whileDragging(event) {
-        if (!this.dragging) {
-            return;
-        }
-        this.moveSlides(event);
-        this.render();
-    }
-
-    moveSlides(event) {
-        this.transformValue = event.clientX - this.initialMousePosition;
-        this.currentPosition = this.initialSlidePosition + this.transformValue;
-    }
-
-    startDrag(event) {
-        console.log('Start Drag')
-        this.dragging = true;
-        this.initialMousePosition = event.clientX;
-        this.initialSlidePosition = this.currentPosition;
-        this.clearIntervals();
-    }
-
-    endDrag(){
-
-        this.dragging = false;
-        let shouldMove = Math.abs(this.currentPosition - this.initialSlidePosition) >= this.effectiveTransform;
-
-        if( shouldMove && this.initialSlidePosition < this.currentPosition && !this.isFirstSlide()) {
-            this.previousSlide();
-        }
-
-        if(shouldMove && this.initialSlidePosition > this.currentPosition && !this.isLastSlide()) {
-            this.nextSlide();
-
-        }
-        this.play();
-
-        this.render();
-    }
-
-    render() {
-        if (!this.dragging)
-            this.currentPosition = (-this.currentSlide * window.innerWidth);
-        this.sliderContainer.style.left = `${this.currentPosition}px`;
-        this.progressbar.style.width = `${this.progressBarWidth}%`
-    }
-
 }
 
 new Slider('slider');
