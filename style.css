@@ -19,25 +19,31 @@ time, mark, audio, video {
     font: inherit;
     vertical-align: baseline;
 }
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
 }
+
 body {
     line-height: 1;
 }
+
 ol, ul {
     list-style: none;
 }
+
 blockquote, q {
     quotes: none;
 }
+
 blockquote:before, blockquote:after,
 q:before, q:after {
     content: '';
     content: none;
 }
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -52,7 +58,7 @@ table {
     position: relative;
 }
 
-.arrow-buttons{
+.arrow-buttons {
     position: absolute;
     z-index: 999;
     top: 50%;
@@ -66,34 +72,51 @@ table {
     left: 15px;
 }
 
-.progressBar{
+.progress-bar {
     height: 10px;
     background-color: black;
     width: 1px;
-    transform: translateY(-100%);
     opacity: 50%;
 }
 
-.button-right{
+.button-right {
     left: auto;
     right: 15px;
+    height: 40px;
+    width: 40px;
 }
 
-.slider .slider-container{
+.slider .slider-container {
     display: flex;
     position: relative;
     overflow: hidden;
+    width: 100%;
     left: 0;
     transition: left 200ms ease-out;
 }
 
-/*.slide{*/
-/*    width: 33.33%;*/
-/*}*/
-.slider .slide img{
-    width:100%;
+.slider .thumbnails {
+    display: flex;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.button-right, .button-left{
+.slider .thumbnails div{
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
+    background-size: 100%;
+    border-radius: 10px;
+    background-position: center center;
+}
+
+
+.slider .slide img {
+    width: 100%;
+    pointer-events: none;
+}
+
+.button-right, .button-left {
     display: flex;
 }

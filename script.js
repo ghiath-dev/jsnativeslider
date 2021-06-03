@@ -1,18 +1,17 @@
 class Slider {
 
     constructor(sliderId = "slider") {
+        /* Data */
         this.slider = document.getElementById(sliderId);
         this.sliderContainer = this.slider.querySelector(".slider-container");
         this.prevButton = this.slider.querySelector('.button-left');
         this.nextButton = this.slider.querySelector('.button-right');
-        this.interval = this.slider.dataset.interval || 3000;
-        this.progressbar = this.slider.querySelector('.progressBar');
-        this.numberOfSliderPerScreen = this.slider.dataset.numberOfSlidesPerScreen || 1;
-        this.loopSlides =  this.slider.dataset.loopSlides || 'true';
-        console.log(this.loopSlides)
-        this.slideImages = this.sliderContainer.children;
-        this.changeImagesWidth();
-
+        this.interval =  parseInt(this.slider.dataset.interval) || 3000;
+        this.progressbar = this.slider.querySelector('.progress-bar');
+        this.sliderPerScreen = parseInt( this.slider.dataset.slidesPerScreen) || 1;
+        this.shouldLoop =  (this.slider.dataset.shouldLoop || 'true') === 'true';
+        this.hasThumbnails =   (this.slider.dataset.hasThumbnails || 'true') === 'true';
+        this.slideItems = this.sliderContainer.children;
 
         /* Attributes */
         this.currentSlide = 0;
@@ -24,33 +23,39 @@ class Slider {
         /* Options */
         this.effectiveTransform = 400;
         this.totalSlides = this.sliderContainer.childElementCount;
-        this.windowSize = (this.totalSlides * window.innerWidth) / this.numberOfSliderPerScreen;
+        this.windowSize = (this.totalSlides * window.innerWidth) / this.sliderPerScreen;
         this.sliderContainer.style.width = `${this.windowSize}px`;
 
-        /* Functionality */
-        this.slider.onmousedown = this.startDrag.bind(this);
-        this.slider.onmousemove = this.whileDragging.bind(this);
-        this.slider.onmouseup = this.endDrag.bind(this);
 
+        /* Binds */
+        this.createThumbnails.bind(this);
         this.progressBarMove.bind(this)
 
-        if (this.prevButton != null)
-            this.prevButton.onclick = this.previousSlide.bind(this);
-        if (this.nextButton != null)
-            this.nextButton.onclick = this.nextSlide.bind(this);
+        /* Functionality */
+        this.setImagesWidth();
+
+        /** TODO: Enable & Disable Dragging */
+        this.slider.onmouseup = this.endDrag.bind(this);
+        this.slider.onmousedown = this.startDrag.bind(this);
+        this.slider.onmousemove = this.whileDragging.bind(this);
+
+        if(this.prevButton !== null) this.prevButton.onclick = this.previousSlide.bind(this);
+        if(this.nextButton !== null) this.nextButton.onclick = this.nextSlide.bind(this);
+        if(this.hasThumbnails) this.createThumbnails();
 
         /* Launching */
         this.play();
     }
 
 
-    changeImagesWidth() {
-
-        for (var i = 0; i < this.slideImages.length; i++) {
-            this.slideImages[i].style.width = `${100 / this.slideImages.length}%`
-
+    setImagesWidth() {
+        for (let i = 0; i < this.slideItems.length; i++) {
+            this.slideItems[i].style.width = `${100 / this.slideItems.length}%`;
+            this.slideItems[i].style.marginRight = (i+1) % this.sliderPerScreen !==0? `1%`: '0';
         }
     }
+
+
     resetTimers() {
         if (this.timer !== null)
             clearInterval(this.timer);
@@ -58,13 +63,11 @@ class Slider {
 
     play() {
         if (this.timer != null) this.resetTimers();
-        this.progressBarMove()
-
+        if(this.progressbar !== null) this.progressBarMove();
 
         this.timer = setInterval(function (_) {
             this.nextSlide();
         }.bind(this), this.interval);
-
     }
 
     render() {
@@ -81,13 +84,11 @@ class Slider {
     }
 
     progressBarMove() {
-        // animate
-        console.log(123)
-
         this.progressbar.animate([
                 {width: '0%'},
                 {width: '100%'}
             ],{
+            easing: 'ease-out',
                 iterations: 1,
                 duration: parseInt(this.interval)
             }
@@ -129,29 +130,29 @@ class Slider {
     nextSlide() {
         this.resetTimers();
 
-        if (this.isLastSlide()) {
-            console.log(this.isLastSlide())
-            if(this.loopSlides === 'true')
-                return this.goToFirstSlide();
-            return
+        if (!this.isLastSlide()) {
+            return this.goToNextSlide();
         }
-        this.goToNextSlide();
+
+        if(this.shouldLoop) {
+            return this.goToFirstSlide();
+        }
     }
 
     previousSlide() {
         this.resetTimers();
 
-        if (this.isFirstSlide()) {
 
-            if(this.loopSlides === 'true')
-                return this.goToLastSlide();
-            return;
+        if (this.isFirstSlide() && this.shouldLoop) {
+
+            return this.goToLastSlide();
         }
         this.goToPreviousSlide();
+
     }
 
     isLastSlide() {
-        return this.currentSlide === (this.totalSlides - 1) / this.numberOfSliderPerScreen;
+        return this.currentSlide === (this.totalSlides - 1) / this.sliderPerScreen;
     }
 
     isFirstSlide() {
@@ -159,11 +160,12 @@ class Slider {
     }
 
     goToFirstSlide() {
-        this.currentSlide = 0;
-        this.currentPosition = 0;
-        this.play();
+        if(this.shouldLoop) {
+            this.currentSlide = 0;
+            this.play();
 
-        return this.render();
+            return this.render();
+        }
     }
 
     goToNextSlide() {
@@ -174,20 +176,46 @@ class Slider {
     }
 
     goToLastSlide() {
-        this.currentSlide = (this.totalSlides - 1)/this.numberOfSliderPerScreen;
+        if(this.shouldLoop) {
+
+            this.currentSlide = (this.totalSlides - 1) / this.sliderPerScreen;
+            this.play();
+
+            return this.render();
+        }
+    }
+
+
+    goToPreviousSlide(){
+        if(!this.isFirstSlide())
+            this.currentSlide--;
         this.play();
 
         return this.render();
     }
+    createThumbnails(){
+        let thumbnailsDiv = document.createElement('div');
+        thumbnailsDiv.classList.add('thumbnails');
+        let thumbnailsImages = this.sliderContainer.querySelectorAll('.slide img');
 
+        thumbnailsImages.forEach(function (item, index) {
+            thumbnailsDiv.appendChild(this.createThumbnail(item.getAttribute('src'), index));
+        }.bind(this));
 
-    goToPreviousSlide() {
-        this.currentSlide--;
-        this.play();
-
-        return this.render();
+        this.slider.appendChild(thumbnailsDiv);
+    }
+    goToElement(index){
+        // return console.log(index)
+        this.currentSlide = index;
+        this.render();
+    }
+    createThumbnail(src,index) {
+        let thumb = document.createElement('div');
+        thumb.style.backgroundImage = `url(${src})`;
+        thumb.onclick = ()=>this.goToElement(index);
+        return thumb;
     }
 }
 
-new Slider('slider');
+let slider = new Slider('slider');
 new Slider('slider2');
