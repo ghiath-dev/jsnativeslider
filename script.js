@@ -41,7 +41,7 @@ class Slider {
 
         if(this.prevButton !== null) this.prevButton.onclick = this.previousSlide.bind(this);
         if(this.nextButton !== null) this.nextButton.onclick = this.nextSlide.bind(this);
-        if(this.hasThumbnails) this.createThumbnails();
+        if(this.hasThumbnails && !this.IsSlidesAllOnScreen()) this.createThumbnails();
 
         /* Launching */
         this.play();
@@ -130,20 +130,19 @@ class Slider {
     nextSlide() {
         this.resetTimers();
 
-        if (!this.isLastSlide()) {
-            return this.goToNextSlide();
-        }
-
-        if(this.shouldLoop) {
+        if (this.isLastSlide()) {
             return this.goToFirstSlide();
+
         }
+        this.goToNextSlide();
+
     }
 
     previousSlide() {
         this.resetTimers();
 
 
-        if (this.isFirstSlide() && this.shouldLoop) {
+        if (this.isFirstSlide()) {
 
             return this.goToLastSlide();
         }
@@ -152,7 +151,7 @@ class Slider {
     }
 
     isLastSlide() {
-        return this.currentSlide === (this.totalSlides - 1) / this.sliderPerScreen;
+        return this.currentSlide === Math.floor((this.totalSlides - 1) / this.sliderPerScreen);
     }
 
     isFirstSlide() {
@@ -163,9 +162,9 @@ class Slider {
         if(this.shouldLoop) {
             this.currentSlide = 0;
             this.play();
-
-            return this.render();
         }
+        return this.render();
+
     }
 
     goToNextSlide() {
@@ -193,7 +192,12 @@ class Slider {
 
         return this.render();
     }
+
+    IsSlidesAllOnScreen(){
+        return this.sliderPerScreen === this.totalSlides;
+    }
     createThumbnails(){
+
         let thumbnailsDiv = document.createElement('div');
         thumbnailsDiv.classList.add('thumbnails');
         let thumbnailsImages = this.sliderContainer.querySelectorAll('.slide img');
@@ -206,7 +210,7 @@ class Slider {
     }
     goToElement(index){
         // return console.log(index)
-        this.currentSlide = index;
+        this.currentSlide = Math.floor(index/this.sliderPerScreen);
         this.render();
     }
     createThumbnail(src,index) {
