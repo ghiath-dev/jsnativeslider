@@ -1,17 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="rtl">
 
 <head>
     <title>Slider</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <meta charset="UTF-8">
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 </head>
 
 <body>
-    <div id="slider" class="slider" data-interval="5000ms" data-effectiveTransform="200px">
+    <div id="slider" class="slider"
+         data-interval="5000"
+         data-effective-transform="200px"
+         data-slides-per-screen='3'
+         data-should-loop='false'
+         data-isrtl='true'
+         data-has-thumbnails="true"
+         data-show-full-screen="true"
+         data-has-indicetors="true">
+        <div class="button-left arrow-buttons">
+            <i class="fas fa-arrow-circle-left"></i>
+        </div>
+        <div class="button-right arrow-buttons">
+            <i class="fas fa-arrow-circle-right"></i>
+        </div>
+        <div class="slider-container">
+            <div class="slide">
+                <img src="assets/images/10-2500x1667.jpg" alt="">
+            </div>
+            <div class="slide">
+                <img src="assets/images/1003-1181x1772.jpg" alt="">
+            </div>
+            <div class="slide">
+                <img src="assets/images/0-5616x3744.jpg" alt="">
+            </div>
+        </div>
+
+        <div class="progress-bar"></div>
+
+<!--        <div class="content-2" data-right="10%" data-width="50%">-->
+<!--            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A amet, distinctio eius est explicabo in, ipsum libero necessitatibus nihil qui, quis quisquam recusandae repellat similique soluta tempora vitae! Necessitatibus, voluptas.</p>-->
+<!--        </div>-->
+
+    </div>
+    <div id="slider2" class="slider"  data-effectiveTransform="200px">
         <div class="button-left arrow-buttons">
             <i class="fas fa-arrow-circle-left"></i>
         </div>
@@ -29,35 +63,10 @@
                 <div style="width: 100%; height: 800px; background-color: green"></div>
             </div>
         </div>
-
-        <div class="content-1" data-left="10%">
-            <h1>Welcome</h1>
-        </div>
-
-        <div class="content-2" data-right="10%" data-width="50%">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A amet, distinctio eius est explicabo in, ipsum libero necessitatibus nihil qui, quis quisquam recusandae repellat similique soluta tempora vitae! Necessitatibus, voluptas.</p>
-        </div>
+        <div class="progressBar"></div>
 
     </div>
-    <div id="slider2" class="slider" data-interval="5000ms" data-effectiveTransform="200px">
-        <div class="button-left arrow-buttons">
-            <i class="fas fa-arrow-circle-left"></i>
-        </div>
-        <div class="button-right arrow-buttons">
-            <i class="fas fa-arrow-circle-right"></i>
-        </div>
-        <div class="slider-container">
-            <div class="slide">
-                <div style="width: 100%; height: 800px; background-color: red"></div>
-            </div>
-            <div class="slide">
-                <div style="width: 100%; height: 800px; background-color: blue"></div>
-            </div>
-            <div class="slide">
-                <div style="width: 100%; height: 800px; background-color: green"></div>
-            </div>
-        </div>
-    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
