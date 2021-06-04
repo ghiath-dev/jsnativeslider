@@ -12,6 +12,8 @@ class Slider {
         this.shouldLoop =  (this.slider.dataset.shouldLoop || 'true') === 'true';
         this.isRtl =  (this.slider.dataset.isrtl || 'false') === 'true';
         this.hasThumbnails =   (this.slider.dataset.hasThumbnails || 'true') === 'true';
+        this.showFullScreen = (this.slider.dataset.showFullScreen || 'false') === 'true';
+        this.hasIndicetors = (this.slider.dataset.hasIndicetors || 'false') === 'true';
         this.slideItems = this.sliderContainer.children;
 
         /* Attributes */
@@ -42,14 +44,36 @@ class Slider {
 
         if(this.prevButton !== null) this.prevButton.onclick = this.isRtl ? this.nextSlide.bind(this) : this.previousSlide.bind(this);
         if(this.nextButton !== null) this.nextButton.onclick = this.isRtl ? this.previousSlide.bind(this) : this.nextSlide.bind(this);
-        if(this.hasThumbnails && !this.IsSlidesAllOnScreen()) this.createThumbnails();
+        if(this.hasThumbnails) this.createThumbnails();
+        if(this.hasIndicetors) this.createIndicators();
 
         /* Launching */
         this.play();
     }
 
 
+
+    createIndicators(){
+        let numberOfIndicators = this.sliderContainer.childElementCount;
+        let indicatorsDiv = document.createElement('div');
+
+        for(let i = 0; i < numberOfIndicators; i++){
+            let indicator = document.createElement('div');
+            indicator.onclick = () => this.goToElement(i);
+            indicatorsDiv.appendChild(indicator);
+        }
+
+        this.sliderContainer.appendChild(indicatorsDiv);
+
+    }
+
+    createIndicator(src,index) {
+        let thumb = document.createElement('div');
+        thumb.onclick = ()=>this.goToElement(index);
+        return thumb;
+    }
     setImagesWidth() {
+        this.sliderContainer.style.height = this.showFullScreen ? `100vh` : 'auto';
         for (let i = 0; i < this.slideItems.length; i++) {
             this.slideItems[i].style.width = `${100 / this.slideItems.length}%`;
 
