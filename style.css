@@ -118,3 +118,21 @@ table {
 .button-right, .button-left {
     display: flex;
 }
+.indicatorDiv{
+
+}
+.indicators{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    position: absolute;
+    bottom: 20%;
+    z-index: 99;
+}
+.indicator{
+    width: 15px;
+    height: 15px;
+    background: gray;
+    opacity: .4;
+    border-radius: 100%;
+}
