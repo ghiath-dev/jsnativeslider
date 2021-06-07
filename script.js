@@ -12,10 +12,9 @@ class Slider {
         this.shouldLoop =  (this.slider.dataset.shouldLoop || 'true') === 'true';
         this.isRtl =  (this.slider.dataset.isrtl || 'false') === 'true';
         this.hasThumbnails =   (this.slider.dataset.hasThumbnails || 'true') === 'true';
+        this.slideItems = this.sliderContainer.children;
         this.showFullScreen = (this.slider.dataset.showFullScreen || 'false') === 'true';
         this.hasIndicetors = (this.slider.dataset.hasIndicetors || 'false') === 'true';
-        this.slideItems = this.sliderContainer.children;
-
         /* Attributes */
         this.currentSlide = 0;
         this.currentPosition = 0;
@@ -24,7 +23,7 @@ class Slider {
         this.transformValue = 0;
 
         /* Options */
-        this.effectiveTransform = 400;
+        this.effectiveTransform = 200;
         this.totalSlides = this.sliderContainer.childElementCount;
         this.windowSize = (this.totalSlides * window.innerWidth) / this.sliderPerScreen;
         this.sliderContainer.style.width = `${this.windowSize}px`;
@@ -52,32 +51,31 @@ class Slider {
     }
 
 
-
     createIndicators(){
         let numberOfIndicators = this.sliderContainer.childElementCount;
         let indicatorsDiv = document.createElement('div');
 
+        indicatorsDiv.classList.add('indicators');
+
         for(let i = 0; i < numberOfIndicators; i++){
             let indicator = document.createElement('div');
+            indicator.classList.add('indicator');
             indicator.onclick = () => this.goToElement(i);
             indicatorsDiv.appendChild(indicator);
         }
 
-        this.sliderContainer.appendChild(indicatorsDiv);
+        this.slider.appendChild(indicatorsDiv);
 
     }
 
-    createIndicator(src,index) {
-        let thumb = document.createElement('div');
-        thumb.onclick = ()=>this.goToElement(index);
-        return thumb;
-    }
     setImagesWidth() {
+
         this.sliderContainer.style.height = this.showFullScreen ? `100vh` : 'auto';
+
         for (let i = 0; i < this.slideItems.length; i++) {
             this.slideItems[i].style.width = `${100 / this.slideItems.length}%`;
 
-            this.isRtl ? this.slideItems[i].style.marginLeft = (i+1) % this.sliderPerScreen !==0? `1%`: '0':
+            this.isRtl ? this.slideItems[i].style.marginLeft = (i+1) % this.sliderPerScreen !==0 ? `1%`: '0':
                 this.slideItems[i].style.marginRight = (i+1) % this.sliderPerScreen !==0? `1%`: '0';
         }
     }
@@ -97,10 +95,21 @@ class Slider {
         }.bind(this), this.interval);
     }
 
+    fillIndicators(){
+        let indicators =  this.slider.querySelectorAll('.indicators .indicator');
+
+        indicators.forEach((item)=>{
+            item.style.opacity = '.5';
+        })
+        console.log(this.currentSlide);
+        this.slider.querySelector(`.indicators div:nth-child(${this.currentSlide+1 })`).style.opacity='1';
+
+    }
     render() {
         if (!this.dragging)
             this.currentPosition = (this.isRtl ? 1 : -1) * (this.currentSlide * window.innerWidth);
 
+        if(this.hasIndicetors) this.fillIndicators();
         this.sliderContainer.style.left = `${this.currentPosition}px`;
     }
 
@@ -142,13 +151,16 @@ class Slider {
 
         this.dragging = false;
         let shouldMove = Math.abs(this.currentPosition - this.initialSlidePosition) >= this.effectiveTransform;
-
+        console.log(`${shouldMove} && ${this.initialSlidePosition < this.currentPosition} && ${!this.isFirstSlide()}`)
+        console.log(shouldMove && this.initialSlidePosition < this.currentPosition && !this.isFirstSlide())
         if (shouldMove && this.initialSlidePosition < this.currentPosition && !this.isFirstSlide()) {
-            this.previousSlide();
+            this.isRtl? this.nextSlide(): this.previousSlide();
         }
 
+        console.log(shouldMove && this.initialSlidePosition > this.currentPosition && !this.isLastSlide())
+        console.log(`${shouldMove} && ${this.initialSlidePosition > this.currentPosition} && ${!this.isLastSlide()}`)
         if (shouldMove && this.initialSlidePosition > this.currentPosition && !this.isLastSlide()) {
-            this.nextSlide();
+            this.isRtl? this.previousSlide(): this.nextSlide();
 
         }
         this.play();
@@ -198,6 +210,7 @@ class Slider {
 
     goToNextSlide() {
         this.currentSlide++;
+
         this.play();
 
         return this.render();
